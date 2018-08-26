@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enterFadeDuration="75"
+    android:exitFadeDuration="500">
+    <item android:drawable="@drawable/recipe_card_pressed"
+        android:state_pressed="true" />
+    <item android:drawable="@drawable/recipe_card_pressed"
+        android:state_focused="true" />
+    <item android:drawable="@drawable/recipe_card" />
+</selector>
