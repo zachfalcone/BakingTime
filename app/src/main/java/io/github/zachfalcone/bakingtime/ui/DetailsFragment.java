@@ -10,8 +10,17 @@ import android.view.ViewGroup;
 
 import butterknife.ButterKnife;
 import io.github.zachfalcone.bakingtime.R;
+import io.github.zachfalcone.bakingtime.object.Recipe;
 
 public class DetailsFragment extends Fragment {
+
+    private Recipe mRecipe;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mRecipe = getArguments().getParcelable("recipe");
+    }
 
     @Nullable
     @Override

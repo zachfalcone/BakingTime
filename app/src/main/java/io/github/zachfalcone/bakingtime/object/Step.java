@@ -51,4 +51,8 @@ public class Step implements Parcelable {
         dest.writeString(mVideoURL);
         dest.writeString(mThumbnailURL);
     }
+
+    public String getShortDescription() {
+        return mShortDescription;
+    }
 }

@@ -53,12 +53,17 @@ public class RecipesFragment extends Fragment {
     TextView textNoConnection;
 
     private RecipeAdapter recipeAdapter;
+    private ArrayList<Recipe> recipes;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         recipeAdapter = new RecipeAdapter();
+
+        /*while (getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getActivity().getSupportFragmentManager().popBackStack();
+        }*/
     }
 
     @Nullable
@@ -77,9 +82,13 @@ public class RecipesFragment extends Fragment {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if (savedInstanceState != null) {
-            ArrayList<Recipe> recipes = savedInstanceState.getParcelableArrayList("recipes");
+        if (recipes != null) {
             populateRecipes(recipes);
+            return view;
+        } else if (savedInstanceState != null) {
+            recipes = savedInstanceState.getParcelableArrayList("recipes");
+            populateRecipes(recipes);
+            return view;
         } else if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
             new LoadRecipes().execute();
         } else {
@@ -156,7 +165,7 @@ public class RecipesFragment extends Fragment {
                 return;
             }
             try {
-                ArrayList<Recipe> recipes = new ArrayList<>();
+                recipes = new ArrayList<>();
                 JSONArray jsonRecipes = new JSONArray(s);
                 for (int i = 0; i < jsonRecipes.length(); ++i) {
                     JSONObject jsonRecipe = jsonRecipes.getJSONObject(i);
@@ -168,7 +177,7 @@ public class RecipesFragment extends Fragment {
                     JSONArray jsonIngredients = jsonRecipe.getJSONArray("ingredients");
                     for (int j = 0; j < jsonIngredients.length(); ++j) {
                         JSONObject jsonIngredient = jsonIngredients.getJSONObject(j);
-                        int quantity = jsonIngredient.getInt("quantity");
+                        double quantity = jsonIngredient.getDouble("quantity");
                         String measure = jsonIngredient.getString("measure");
                         String ingredientItem = jsonIngredient.getString("ingredient");
                         Ingredient ingredient = new Ingredient(quantity, measure, ingredientItem);

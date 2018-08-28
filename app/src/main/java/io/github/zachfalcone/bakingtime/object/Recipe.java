@@ -69,4 +69,12 @@ public class Recipe implements Parcelable {
     public int getNumberOfSteps() {
         return mSteps.size();
     }
+
+    public List<Step> getSteps() {
+        return mSteps;
+    }
+
+    public List<Ingredient> getIngredients() {
+        return mIngredients;
+    }
 }
