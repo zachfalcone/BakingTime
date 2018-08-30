@@ -74,6 +74,10 @@ public class Recipe implements Parcelable {
         return mSteps;
     }
 
+    public Step getStep(int position) {
+        return mSteps.get(position);
+    }
+
     public List<Ingredient> getIngredients() {
         return mIngredients;
     }

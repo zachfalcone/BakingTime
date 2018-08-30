@@ -58,7 +58,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.tv_title.setText(mRecipes.get(position).getName());
-        holder.tv_description.setText(String.valueOf(mRecipes.get(position).getNumberOfSteps()));
+        // number of steps - introduction:
+        holder.tv_description.setText(String.valueOf(mRecipes.get(position).getNumberOfSteps() - 1));
     }
 
     @Override

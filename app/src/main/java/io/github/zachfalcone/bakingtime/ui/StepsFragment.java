@@ -8,13 +8,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,7 +18,6 @@ import io.github.zachfalcone.bakingtime.R;
 import io.github.zachfalcone.bakingtime.adapter.IngredientAdapter;
 import io.github.zachfalcone.bakingtime.adapter.RecipeAdapter;
 import io.github.zachfalcone.bakingtime.adapter.StepAdapter;
-import io.github.zachfalcone.bakingtime.object.Ingredient;
 import io.github.zachfalcone.bakingtime.object.Recipe;
 
 public class StepsFragment extends Fragment {
@@ -68,11 +63,12 @@ public class StepsFragment extends Fragment {
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-                DetailsFragment detailsFragment = new DetailsFragment();
+                DetailsPagerFragment detailsPagerFragment = new DetailsPagerFragment();
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("recipe", mRecipe);
-                detailsFragment.setArguments(bundle);
-                fragmentTransaction.replace(R.id.fragment_main, detailsFragment);
+                bundle.putInt("position", position);
+                detailsPagerFragment.setArguments(bundle);
+                fragmentTransaction.replace(R.id.fragment_main, detailsPagerFragment);
                 fragmentTransaction.addToBackStack("stepStack");
                 fragmentTransaction.commit();
             }

@@ -85,10 +85,9 @@ public class RecipesFragment extends Fragment {
         if (recipes != null) {
             populateRecipes(recipes);
             return view;
-        } else if (savedInstanceState != null) {
-            recipes = savedInstanceState.getParcelableArrayList("recipes");
-            populateRecipes(recipes);
-            return view;
+        //} else if (savedInstanceState != null) {
+            //recipes = savedInstanceState.getParcelableArrayList("recipes");
+            //populateRecipes(recipes);
         } else if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
             new LoadRecipes().execute();
         } else {
@@ -126,7 +125,7 @@ public class RecipesFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("recipes", recipeAdapter.getRecipes());
+        //outState.putParcelableArrayList("recipes", recipeAdapter.getRecipes());
     }
 
     private class LoadRecipes extends AsyncTask<Void, Void, String> {
