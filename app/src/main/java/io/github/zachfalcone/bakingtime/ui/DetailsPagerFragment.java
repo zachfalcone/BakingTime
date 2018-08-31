@@ -37,7 +37,7 @@ public class DetailsPagerFragment extends Fragment {
 
         detailsPager = view.findViewById(R.id.details_pager);
 
-        mPagerAdapter = new DetailsPagerAdapter(getActivity().getSupportFragmentManager());
+        mPagerAdapter = new DetailsPagerAdapter(getChildFragmentManager());
         detailsPager.setAdapter(mPagerAdapter);
         detailsPager.setCurrentItem(mPosition);
 

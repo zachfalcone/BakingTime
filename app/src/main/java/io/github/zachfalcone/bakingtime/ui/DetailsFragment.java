@@ -5,11 +5,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,6 +33,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
 
 import io.github.zachfalcone.bakingtime.R;
 import io.github.zachfalcone.bakingtime.object.Step;
@@ -61,6 +64,13 @@ public class DetailsFragment extends Fragment {
 
         if (mStep.getVideoURL().isEmpty()) {
             playerView.setVisibility(View.GONE);
+            // show thumbnail if exists
+            String thumbnailURL = mStep.getThumbnailURL();
+            if (!TextUtils.isEmpty(thumbnailURL)) {
+                ImageView imageThumbnail = view.findViewById(R.id.image_thumbnail);
+                imageThumbnail.setVisibility(View.VISIBLE);
+                Picasso.with(getContext()).load(thumbnailURL).into(imageThumbnail);
+            }
         } else {
             // initialize player after layout inflated
             view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
@@ -96,8 +106,8 @@ public class DetailsFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onPause() {
+        super.onPause();
         if (player != null) {
             player.stop();
             player.release();
