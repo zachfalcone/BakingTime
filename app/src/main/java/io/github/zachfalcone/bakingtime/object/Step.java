@@ -2,6 +2,7 @@ package io.github.zachfalcone.bakingtime.object;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 public class Step implements Parcelable {
     private int mId;
@@ -15,7 +16,15 @@ public class Step implements Parcelable {
         mShortDescription = shortDescription;
         mDescription = description;
         mVideoURL = videoURL;
-        mThumbnailURL = thumbnailURL;
+
+        int lengthThumbnailURL = thumbnailURL.length();
+        if (mVideoURL.isEmpty() &&
+                lengthThumbnailURL >= 4 &&
+                thumbnailURL.substring(lengthThumbnailURL - 4).equals(".mp4")) {
+            mVideoURL = thumbnailURL;
+        } else {
+            mThumbnailURL = thumbnailURL;
+        }
     }
 
     private Step(Parcel in) {
@@ -58,5 +67,9 @@ public class Step implements Parcelable {
 
     public String getDescription() {
         return mDescription;
+    }
+
+    public String getVideoURL() {
+        return mVideoURL;
     }
 }

@@ -1,6 +1,7 @@
 package io.github.zachfalcone.bakingtime.ui;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -10,8 +11,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,8 +37,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.github.zachfalcone.bakingtime.R;
 import io.github.zachfalcone.bakingtime.adapter.RecipeAdapter;
 import io.github.zachfalcone.bakingtime.object.Ingredient;
@@ -43,14 +44,10 @@ import io.github.zachfalcone.bakingtime.object.Recipe;
 import io.github.zachfalcone.bakingtime.object.Step;
 
 public class RecipesFragment extends Fragment {
-    @BindView(R.id.recycle_recipes)
-    RecyclerView recycleRecipes;
 
-    @BindView(R.id.progress_bar_recipes)
-    ProgressBar progressRecipes;
-
-    @BindView(R.id.text_no_connection)
-    TextView textNoConnection;
+    private RecyclerView recycleRecipes;
+    private ProgressBar progressRecipes;
+    private TextView textNoConnection;
 
     private RecipeAdapter recipeAdapter;
     private ArrayList<Recipe> recipes;
@@ -58,12 +55,7 @@ public class RecipesFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         recipeAdapter = new RecipeAdapter();
-
-        /*while (getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            getActivity().getSupportFragmentManager().popBackStack();
-        }*/
     }
 
     @Nullable
@@ -72,11 +64,21 @@ public class RecipesFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_recipes, container, false);
 
-        ButterKnife.bind(this, view);
+        recycleRecipes = view.findViewById(R.id.recycle_recipes);
+        progressRecipes = view.findViewById(R.id.progress_bar_recipes);
+        textNoConnection = view.findViewById(R.id.text_no_connection);
 
         getActivity().setTitle(getString(R.string.recipes));
 
-        recycleRecipes.setLayoutManager(new LinearLayoutManager(getContext()));
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        if (dpWidth <= 600) {
+            recycleRecipes.setLayoutManager(new LinearLayoutManager(getContext()));
+        } else {
+            recycleRecipes.setLayoutManager(new GridLayoutManager(getContext(), (int) dpWidth / 300));
+            // int padding = 15 * (int) displayMetrics.density;
+            // recycleRecipes.setPadding(padding, padding, padding, padding);
+        }
         recycleRecipes.setAdapter(recipeAdapter);
 
         ConnectivityManager connectivityManager =
@@ -85,9 +87,9 @@ public class RecipesFragment extends Fragment {
         if (recipes != null) {
             populateRecipes(recipes);
             return view;
-        //} else if (savedInstanceState != null) {
-            //recipes = savedInstanceState.getParcelableArrayList("recipes");
-            //populateRecipes(recipes);
+        } else if (savedInstanceState != null) {
+            recipes = savedInstanceState.getParcelableArrayList("recipes");
+            populateRecipes(recipes);
         } else if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
             new LoadRecipes().execute();
         } else {
@@ -125,7 +127,7 @@ public class RecipesFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        //outState.putParcelableArrayList("recipes", recipeAdapter.getRecipes());
+        outState.putParcelableArrayList("recipes", recipeAdapter.getRecipes());
     }
 
     private class LoadRecipes extends AsyncTask<Void, Void, String> {

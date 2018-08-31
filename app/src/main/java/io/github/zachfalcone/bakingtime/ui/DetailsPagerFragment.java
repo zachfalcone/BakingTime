@@ -12,19 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.github.zachfalcone.bakingtime.R;
 import io.github.zachfalcone.bakingtime.object.Recipe;
 
 public class DetailsPagerFragment extends Fragment {
-    @BindView(R.id.details_pager)
-    ViewPager detailsPager;
 
+    private ViewPager detailsPager;
     private Recipe mRecipe;
-
     private PagerAdapter mPagerAdapter;
-
     private int mPosition;
 
     @Override
@@ -40,7 +35,7 @@ public class DetailsPagerFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_details_pager, container, false);
 
-        ButterKnife.bind(this, view);
+        detailsPager = view.findViewById(R.id.details_pager);
 
         mPagerAdapter = new DetailsPagerAdapter(getActivity().getSupportFragmentManager());
         detailsPager.setAdapter(mPagerAdapter);
@@ -69,7 +64,5 @@ public class DetailsPagerFragment extends Fragment {
         public int getCount() {
             return mRecipe.getNumberOfSteps();
         }
-
-        // TODO setPrimaryItem position
     }
 }
