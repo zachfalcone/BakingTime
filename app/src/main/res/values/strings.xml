@@ -5,4 +5,5 @@
     <string name="recipes_url" translatable="false">https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json</string>
     <string name="steps">Steps</string>
     <string name="no_connection">No connection</string>
+    <string name="select_recipe">Select a recipe</string>
 </resources>

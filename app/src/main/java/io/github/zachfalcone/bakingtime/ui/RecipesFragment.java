@@ -1,6 +1,10 @@
 package io.github.zachfalcone.bakingtime.ui;
 
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -11,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +54,6 @@ public class RecipesFragment extends Fragment {
     private RecyclerView recycleRecipes;
     private ProgressBar progressRecipes;
     private TextView textNoConnection;
-
     private RecipeAdapter recipeAdapter;
     private ArrayList<Recipe> recipes;
 
@@ -99,6 +104,42 @@ public class RecipesFragment extends Fragment {
             textNoConnection.setVisibility(View.VISIBLE);
         }
 
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Intent intent = getActivity().getIntent();
+        Bundle bundle = intent.getExtras();
+        if (bundle != null) {
+            final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+            if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                AppCompatActivity activity = (AppCompatActivity) getActivity();
+                activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getActivity().setTitle(getString(R.string.select_recipe));
+                recipeAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        // Toast.makeText(getContext(), recipes.get(position).getName(), Toast.LENGTH_SHORT).show();
+                        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getContext());
+                        RemoteViews views = new RemoteViews(getContext().getPackageName(), R.layout.widget_recipe);
+
+                        Intent intent = new Intent(getContext(), MainActivity.class);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        views.setOnClickPendingIntent(R.id.widget_ingredients, pendingIntent);
+
+                        appWidgetManager.updateAppWidget(appWidgetId, views);
+
+                        Intent resultValue = new Intent();
+                        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+                        getActivity().setResult(Activity.RESULT_OK, resultValue);
+                        getActivity().finish();
+                    }
+                });
+                return;
+            }
+        }
         recipeAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -114,8 +155,6 @@ public class RecipesFragment extends Fragment {
                 fragmentTransaction.commit();
             }
         });
-
-        return view;
     }
 
     private void populateRecipes(ArrayList<Recipe> recipes) {

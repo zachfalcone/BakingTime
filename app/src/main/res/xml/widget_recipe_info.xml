@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<appwidget-provider
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/widget_recipe"
+    android:updatePeriodMillis="0"
+    android:resizeMode="horizontal|vertical"
+    android:minHeight="40dp"
+    android:minWidth="250dp"
+    android:configure="io.github.zachfalcone.bakingtime.ui.MainActivity"/>
