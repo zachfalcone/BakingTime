@@ -48,6 +48,7 @@ import io.github.zachfalcone.bakingtime.adapter.RecipeAdapter;
 import io.github.zachfalcone.bakingtime.object.Ingredient;
 import io.github.zachfalcone.bakingtime.object.Recipe;
 import io.github.zachfalcone.bakingtime.object.Step;
+import io.github.zachfalcone.bakingtime.widget.RecipeWidgetProvider;
 
 public class RecipesFragment extends Fragment {
 
@@ -55,7 +56,7 @@ public class RecipesFragment extends Fragment {
     private ProgressBar progressRecipes;
     private TextView textNoConnection;
     private RecipeAdapter recipeAdapter;
-    private ArrayList<Recipe> recipes;
+    private ArrayList<Recipe> mRecipes;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,12 +90,12 @@ public class RecipesFragment extends Fragment {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if (recipes != null) {
-            populateRecipes(recipes);
+        if (mRecipes != null) {
+            populateRecipes(mRecipes);
             return view;
         } else if (savedInstanceState != null) {
-            recipes = savedInstanceState.getParcelableArrayList("recipes");
-            populateRecipes(recipes);
+            mRecipes = savedInstanceState.getParcelableArrayList("recipes");
+            populateRecipes(mRecipes);
         } else if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
             new LoadRecipes().execute();
         } else {
@@ -121,15 +122,14 @@ public class RecipesFragment extends Fragment {
                 recipeAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        // Toast.makeText(getContext(), recipes.get(position).getName(), Toast.LENGTH_SHORT).show();
                         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getContext());
                         RemoteViews views = new RemoteViews(getContext().getPackageName(), R.layout.widget_recipe);
 
-                        Intent intent = new Intent(getContext(), MainActivity.class);
-                        PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                        views.setOnClickPendingIntent(R.id.widget_ingredients, pendingIntent);
-
-                        appWidgetManager.updateAppWidget(appWidgetId, views);
+                        RecipeWidgetProvider.updateNewWidget(
+                                getContext(),
+                                appWidgetManager,
+                                appWidgetId,
+                                mRecipes.get(position));
 
                         Intent resultValue = new Intent();
                         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
@@ -205,7 +205,7 @@ public class RecipesFragment extends Fragment {
                 return;
             }
             try {
-                recipes = new ArrayList<>();
+                mRecipes = new ArrayList<>();
                 JSONArray jsonRecipes = new JSONArray(s);
                 for (int i = 0; i < jsonRecipes.length(); ++i) {
                     JSONObject jsonRecipe = jsonRecipes.getJSONObject(i);
@@ -242,10 +242,10 @@ public class RecipesFragment extends Fragment {
                     String image = jsonRecipe.getString("image");
 
                     Recipe recipe = new Recipe(id, name, ingredients, steps, servings, image);
-                    recipes.add(recipe);
+                    mRecipes.add(recipe);
                 }
 
-                populateRecipes(recipes);
+                populateRecipes(mRecipes);
 
             } catch (JSONException e) {
                 e.printStackTrace();

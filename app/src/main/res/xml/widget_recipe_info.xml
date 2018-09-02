@@ -5,6 +5,6 @@
     android:initialLayout="@layout/widget_recipe"
     android:updatePeriodMillis="0"
     android:resizeMode="horizontal|vertical"
-    android:minHeight="40dp"
-    android:minWidth="250dp"
+    android:minHeight="180dp"
+    android:minWidth="320dp"
     android:configure="io.github.zachfalcone.bakingtime.ui.MainActivity"/>

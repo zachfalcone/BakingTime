@@ -55,4 +55,15 @@ public class Ingredient implements Parcelable {
     public String getIngredient() {
         return mIngredient;
     }
+
+    public String getMeasurement() {
+        String text;
+        if ((int) mQuantity == mQuantity) {
+            text = String.valueOf((int) mQuantity);
+        } else {
+            text = String.valueOf(mQuantity);
+        }
+        text += " " + mMeasure;
+        return text;
+    }
 }

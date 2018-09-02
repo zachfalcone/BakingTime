@@ -1,15 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="@drawable/widget_card"
+    android:padding="30dp"
+    android:id="@+id/widget_layout"
+    tools:layout_height="wrap_content"
+    android:alpha="0.9">
 
     <TextView
-        android:id="@+id/widget_ingredients"
+        android:id="@+id/widget_recipe_name"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="30dp"
+        android:layout_height="wrap_content"
+        tools:text="Recipe"
+        android:textColor="#000000"
+        android:textSize="20sp"
         android:textAlignment="center"
-        android:text="Test"
-        android:background="#FFFFFF"/>
+        android:layout_marginBottom="15dp"
+        android:singleLine="true"
+        android:ellipsize="end"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@+id/widget_ingredients"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            tools:listitem="@android:layout/simple_list_item_1"/>
+
+    </FrameLayout>
 
 </LinearLayout>
