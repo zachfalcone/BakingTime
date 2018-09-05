@@ -6,6 +6,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.facebook.stetho.Stetho;
 
 import io.github.zachfalcone.bakingtime.R;
 
@@ -21,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
             RecipesFragment recipesFragment = new RecipesFragment();
+            recipesFragment.setArguments(getIntent().getExtras());
             fragmentTransaction.replace(R.id.fragment_main, recipesFragment);
             fragmentTransaction.commit();
         }
@@ -28,6 +32,11 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         getSupportFragmentManager().addOnBackStackChangedListener(this);
 
         displayUp();
+
+        /*Stetho.initialize(Stetho.newInitializerBuilder(this)
+                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
+                .build());*/
     }
 
     @Override

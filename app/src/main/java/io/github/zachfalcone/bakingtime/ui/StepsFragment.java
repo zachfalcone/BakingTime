@@ -20,26 +20,26 @@ import io.github.zachfalcone.bakingtime.object.Recipe;
 
 public class StepsFragment extends Fragment {
 
-    private RecyclerView recycleSteps;
-    private RecyclerView recycleIngredients;
     private Recipe mRecipe;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRecipe = getArguments().getParcelable("recipe");
+        if (getArguments() != null) {
+            mRecipe = getArguments().getParcelable("recipe");
+        }
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        // TODO check if position restored on rotate
         View view = inflater.inflate(R.layout.fragment_steps, container, false);
 
         getActivity().setTitle(mRecipe.getName());
 
-        recycleSteps = view.findViewById(R.id.recycle_steps);
-        recycleIngredients = view.findViewById(R.id.recycle_ingredients);
+        RecyclerView recycleSteps = view.findViewById(R.id.recycle_steps);
+        RecyclerView recycleIngredients = view.findViewById(R.id.recycle_ingredients);
 
         IngredientAdapter ingredientAdapter = new IngredientAdapter(mRecipe.getIngredients());
         recycleIngredients.setLayoutManager(new LinearLayoutManager(getContext()));

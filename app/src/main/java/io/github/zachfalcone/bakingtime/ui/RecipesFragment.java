@@ -54,14 +54,17 @@ public class RecipesFragment extends Fragment {
 
     private RecyclerView recycleRecipes;
     private ProgressBar progressRecipes;
-    private TextView textNoConnection;
     private RecipeAdapter recipeAdapter;
     private ArrayList<Recipe> mRecipes;
+    private int recipeId;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         recipeAdapter = new RecipeAdapter();
+        if (getArguments() != null) {
+            recipeId = getArguments().getInt("recipeId");
+        }
     }
 
     @Nullable
@@ -72,7 +75,7 @@ public class RecipesFragment extends Fragment {
 
         recycleRecipes = view.findViewById(R.id.recycle_recipes);
         progressRecipes = view.findViewById(R.id.progress_bar_recipes);
-        textNoConnection = view.findViewById(R.id.text_no_connection);
+        TextView textNoConnection = view.findViewById(R.id.text_no_connection);
 
         getActivity().setTitle(getString(R.string.recipes));
 
@@ -82,8 +85,8 @@ public class RecipesFragment extends Fragment {
             recycleRecipes.setLayoutManager(new LinearLayoutManager(getContext()));
         } else {
             recycleRecipes.setLayoutManager(new GridLayoutManager(getContext(), (int) dpWidth / 300));
-            // int padding = 15 * (int) displayMetrics.density;
-            // recycleRecipes.setPadding(padding, padding, padding, padding);
+            int padding = 15 * (int) displayMetrics.density;
+            recycleRecipes.setPadding(padding, padding, padding, padding);
         }
         recycleRecipes.setAdapter(recipeAdapter);
 
@@ -125,7 +128,7 @@ public class RecipesFragment extends Fragment {
                         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getContext());
                         RemoteViews views = new RemoteViews(getContext().getPackageName(), R.layout.widget_recipe);
 
-                        RecipeWidgetProvider.updateNewWidget(
+                        RecipeWidgetProvider.addNewWidget(
                                 getContext(),
                                 appWidgetManager,
                                 appWidgetId,
@@ -143,24 +146,42 @@ public class RecipesFragment extends Fragment {
         recipeAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-                StepsFragment stepsFragment = new StepsFragment();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("recipe", recipeAdapter.getRecipe(position));
-                stepsFragment.setArguments(bundle);
-                fragmentTransaction.replace(R.id.fragment_main, stepsFragment);
-                fragmentTransaction.addToBackStack("recipeStack");
-                fragmentTransaction.commit();
+                openStepsFragment(position);
             }
         });
+    }
+
+    private void openStepsFragment(int position) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        StepsFragment stepsFragment = new StepsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("recipe", recipeAdapter.getRecipe(position));
+        stepsFragment.setArguments(bundle);
+        fragmentTransaction.replace(R.id.fragment_main, stepsFragment);
+        fragmentTransaction.addToBackStack("recipeStack");
+        fragmentTransaction.commit();
     }
 
     private void populateRecipes(ArrayList<Recipe> recipes) {
         recipeAdapter.updateRecipes(recipes);
         progressRecipes.setVisibility(View.GONE);
         recycleRecipes.setVisibility(View.VISIBLE);
+
+        if (recipeId >= 0) {
+            int n_recipes = mRecipes.size(), i;
+            for (i = 0; i < n_recipes; ++i) {
+                if (mRecipes.get(i).getId() == recipeId) break;
+            }
+            if (i < mRecipes.size()) {
+                openStepsFragment(i);
+                recipeId = -1;
+                if (getArguments() != null) {
+                    getArguments().putInt("recipeId", recipeId);
+                }
+            }
+        }
     }
 
     @Override

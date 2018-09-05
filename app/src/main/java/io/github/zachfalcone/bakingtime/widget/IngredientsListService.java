@@ -5,25 +5,32 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import io.github.zachfalcone.bakingtime.object.Ingredient;
+import io.github.zachfalcone.bakingtime.widget.data.WidgetDatabase;
 
 public class IngredientsListService extends RemoteViewsService {
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        ArrayList<String> ingredientsMeasurement = intent.getStringArrayListExtra("ingredientsMeasurement");
-        ArrayList<String> ingredientsText = intent.getStringArrayListExtra("ingredientsText");
-        return new ListRemoteViewsFactory(getApplicationContext(), ingredientsMeasurement, ingredientsText);
+        // ArrayList<String> ingredientsMeasurement = intent.getStringArrayListExtra("ingredientsMeasurement");
+        // ArrayList<String> ingredientsText = intent.getStringArrayListExtra("ingredientsText");
+        int appWidgetId = intent.getIntExtra("appWidgetId", 0);
+        return new ListRemoteViewsFactory(getApplicationContext(), appWidgetId); //, ingredientsMeasurement, ingredientsText);
     }
 }
 
 class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private Context mContext;
-    private ArrayList<String> mIngredientsMeasure, mIngredientsText;
+    //private ArrayList<String> mIngredientsMeasure, mIngredientsText;
+    private List<Ingredient> mIngredients;
 
-    public ListRemoteViewsFactory(Context context, ArrayList<String> ingredientsMeasurement, ArrayList<String> ingredientsText) {
+    public ListRemoteViewsFactory(Context context, int appWidgetId) {//, ArrayList<String> ingredientsMeasurement, ArrayList<String> ingredientsText) {
         mContext = context;
-        mIngredientsMeasure = ingredientsMeasurement;
-        mIngredientsText = ingredientsText;
+        //mIngredientsMeasure = ingredientsMeasurement;
+        //mIngredientsText = ingredientsText;
+        WidgetDatabase widgetDatabase = new WidgetDatabase(mContext);
+        mIngredients = widgetDatabase.getIngredients(appWidgetId);
     }
 
     @Override
@@ -43,17 +50,20 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public int getCount() {
-        return mIngredientsText.size();
+        return mIngredients.size();
     }
 
     @Override
     public RemoteViews getViewAt(int i) {
+        String measurement = mIngredients.get(i).getMeasurement();
+        String name = mIngredients.get(i).getIngredient();
+
         RemoteViews views = new RemoteViews(mContext.getPackageName(), android.R.layout.simple_list_item_1);
-        String ingredientText = mIngredientsMeasure.get(i) + " " + mIngredientsText.get(i);
+        String ingredientText = measurement + " " + name;
         views.setTextViewText(android.R.id.text1, ingredientText);
 
         Intent fillInIntent = new Intent();
-        fillInIntent.putExtra("ingredient", mIngredientsText.get(i));
+        fillInIntent.putExtra("ingredient", name);
         views.setOnClickFillInIntent(android.R.id.text1, fillInIntent);
 
         return views;

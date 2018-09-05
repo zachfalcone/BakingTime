@@ -81,4 +81,8 @@ public class Recipe implements Parcelable {
     public List<Ingredient> getIngredients() {
         return mIngredients;
     }
+
+    public int getId() {
+        return mId;
+    }
 }

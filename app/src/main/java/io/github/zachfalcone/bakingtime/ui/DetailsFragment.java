@@ -44,11 +44,14 @@ public class DetailsFragment extends Fragment {
     private TextView stepDescription;
     private Step mStep;
     private ExoPlayer player;
+    private boolean autoPlay;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mStep = getArguments().getParcelable("step");
+        if (getArguments() != null) {
+            mStep = getArguments().getParcelable("step");
+        }
     }
 
     @Nullable
@@ -73,6 +76,7 @@ public class DetailsFragment extends Fragment {
             }
         } else {
             // initialize player after layout inflated
+            autoPlay = getActivity().findViewById(R.id.master_detail_flow) == null;
             view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                 @Override
                 public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
@@ -95,7 +99,7 @@ public class DetailsFragment extends Fragment {
                     new DefaultDataSourceFactory(getContext(), userAgent)
             ).createMediaSource(Uri.parse(mStep.getVideoURL()));
             player.prepare(mediaSource);
-            player.setPlayWhenReady(true);
+            player.setPlayWhenReady(autoPlay);
             playerView.hideController();
 
             // video ratio: 1920:1080 = 16:9
