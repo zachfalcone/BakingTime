@@ -54,9 +54,11 @@ public class RecipesFragment extends Fragment {
 
     private RecyclerView recycleRecipes;
     private ProgressBar progressRecipes;
+    private TextView textNoConnection;
     private RecipeAdapter recipeAdapter;
     private ArrayList<Recipe> mRecipes;
     private int recipeId;
+    private ConnectivityManager connectivityManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,7 +77,7 @@ public class RecipesFragment extends Fragment {
 
         recycleRecipes = view.findViewById(R.id.recycle_recipes);
         progressRecipes = view.findViewById(R.id.progress_bar_recipes);
-        TextView textNoConnection = view.findViewById(R.id.text_no_connection);
+        textNoConnection = view.findViewById(R.id.text_no_connection);
 
         getActivity().setTitle(getString(R.string.recipes));
 
@@ -90,8 +92,10 @@ public class RecipesFragment extends Fragment {
         }
         recycleRecipes.setAdapter(recipeAdapter);
 
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null) {
+            connectivityManager =
+                    (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        }
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (mRecipes != null) {
             populateRecipes(mRecipes);
@@ -114,6 +118,14 @@ public class RecipesFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        if (mRecipes == null) {
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
+                textNoConnection.setVisibility(View.GONE);
+                progressRecipes.setVisibility(View.VISIBLE);
+                new LoadRecipes().execute();
+            }
+        }
         Intent intent = getActivity().getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {

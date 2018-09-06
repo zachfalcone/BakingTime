@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import io.github.zachfalcone.bakingtime.R;
 import io.github.zachfalcone.bakingtime.adapter.IngredientAdapter;
@@ -33,13 +34,15 @@ public class StepsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // TODO check if position restored on rotate
         View view = inflater.inflate(R.layout.fragment_steps, container, false);
 
         getActivity().setTitle(mRecipe.getName());
 
         RecyclerView recycleSteps = view.findViewById(R.id.recycle_steps);
         RecyclerView recycleIngredients = view.findViewById(R.id.recycle_ingredients);
+
+        TextView textServings = view.findViewById(R.id.text_servings);
+        textServings.setText(String.format(getString(R.string.makes_n_servings), mRecipe.getServings()));
 
         IngredientAdapter ingredientAdapter = new IngredientAdapter(mRecipe.getIngredients());
         recycleIngredients.setLayoutManager(new LinearLayoutManager(getContext()));

@@ -2,6 +2,7 @@ package io.github.zachfalcone.bakingtime.widget;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -13,22 +14,17 @@ import io.github.zachfalcone.bakingtime.widget.data.WidgetDatabase;
 public class IngredientsListService extends RemoteViewsService {
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        // ArrayList<String> ingredientsMeasurement = intent.getStringArrayListExtra("ingredientsMeasurement");
-        // ArrayList<String> ingredientsText = intent.getStringArrayListExtra("ingredientsText");
         int appWidgetId = intent.getIntExtra("appWidgetId", 0);
-        return new ListRemoteViewsFactory(getApplicationContext(), appWidgetId); //, ingredientsMeasurement, ingredientsText);
+        return new ListRemoteViewsFactory(getApplicationContext(), appWidgetId);
     }
 }
 
 class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private Context mContext;
-    //private ArrayList<String> mIngredientsMeasure, mIngredientsText;
     private List<Ingredient> mIngredients;
 
-    public ListRemoteViewsFactory(Context context, int appWidgetId) {//, ArrayList<String> ingredientsMeasurement, ArrayList<String> ingredientsText) {
+    public ListRemoteViewsFactory(Context context, int appWidgetId) {
         mContext = context;
-        //mIngredientsMeasure = ingredientsMeasurement;
-        //mIngredientsText = ingredientsText;
         WidgetDatabase widgetDatabase = new WidgetDatabase(mContext);
         mIngredients = widgetDatabase.getIngredients(appWidgetId);
     }
@@ -61,6 +57,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         RemoteViews views = new RemoteViews(mContext.getPackageName(), android.R.layout.simple_list_item_1);
         String ingredientText = measurement + " " + name;
         views.setTextViewText(android.R.id.text1, ingredientText);
+        views.setTextColor(android.R.id.text1, Color.BLACK);
 
         Intent fillInIntent = new Intent();
         fillInIntent.putExtra("ingredient", name);

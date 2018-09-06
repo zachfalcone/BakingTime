@@ -8,4 +8,5 @@
     <string name="select_recipe">Select a recipe</string>
     <string name="ingredients">Ingredients</string>
     <string name="ingredient_list">Ingredient List</string>
+    <string name="makes_n_servings">Makes %d servings</string>
 </resources>

@@ -93,6 +93,7 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
         if (intent.getAction().equals(ACTION_INGREDIENT)) {
             String ingredient = intent.getStringExtra("ingredient");
             Intent searchIntent = new Intent(Intent.ACTION_WEB_SEARCH);
+            searchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             searchIntent.putExtra(SearchManager.QUERY, ingredient);
             context.startActivity(searchIntent);
         }

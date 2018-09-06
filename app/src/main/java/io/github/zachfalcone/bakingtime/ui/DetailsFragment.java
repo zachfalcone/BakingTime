@@ -63,7 +63,8 @@ public class DetailsFragment extends Fragment {
         playerView = view.findViewById(R.id.player);
         stepDescription = view.findViewById(R.id.step_description);
 
-        stepDescription.setText(mStep.getDescription());
+        String description = mStep.getDescription().replaceAll("([0-9]*)�(F)", "$1°$2");
+        stepDescription.setText(description);
 
         if (mStep.getVideoURL().isEmpty()) {
             playerView.setVisibility(View.GONE);
@@ -110,12 +111,20 @@ public class DetailsFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroyView() {
+        super.onDestroyView();
         if (player != null) {
             player.stop();
             player.release();
             player = null;
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (player != null) {
+            player.setPlayWhenReady(false);
         }
     }
 
