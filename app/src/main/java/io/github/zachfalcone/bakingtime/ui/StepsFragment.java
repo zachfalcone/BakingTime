@@ -22,12 +22,18 @@ import io.github.zachfalcone.bakingtime.object.Recipe;
 public class StepsFragment extends Fragment {
 
     private Recipe mRecipe;
+    private int selectedStep;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mRecipe = getArguments().getParcelable("recipe");
+        }
+        if (savedInstanceState != null) {
+            selectedStep = savedInstanceState.getInt("selectedStep");
+        } else {
+            selectedStep = 0;
         }
     }
 
@@ -62,7 +68,7 @@ public class StepsFragment extends Fragment {
                 public void onItemClick(View view, int position) {
                     FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
+                    selectedStep = position;
                     DetailsPagerFragment detailsPagerFragment = new DetailsPagerFragment();
                     Bundle bundle = new Bundle();
                     bundle.putParcelable("recipe", mRecipe);
@@ -76,7 +82,7 @@ public class StepsFragment extends Fragment {
         } else {
             DetailsFragment detailsFragment = new DetailsFragment();
             Bundle bundle = new Bundle();
-            bundle.putParcelable("step", mRecipe.getStep(0));
+            bundle.putParcelable("step", mRecipe.getStep(selectedStep));
             detailsFragment.setArguments(bundle);
             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -86,6 +92,7 @@ public class StepsFragment extends Fragment {
             stepAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(View view, int position) {
+                    selectedStep = position;
                     DetailsFragment detailsFragment = new DetailsFragment();
                     Bundle bundle = new Bundle();
                     bundle.putParcelable("step", mRecipe.getStep(position));
@@ -99,5 +106,11 @@ public class StepsFragment extends Fragment {
         }
 
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("selectedStep", selectedStep);
     }
 }
