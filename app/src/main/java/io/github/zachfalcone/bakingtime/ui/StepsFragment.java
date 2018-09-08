@@ -8,10 +8,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.ui.PlayerView;
 
 import io.github.zachfalcone.bakingtime.R;
 import io.github.zachfalcone.bakingtime.adapter.IngredientAdapter;
@@ -83,6 +87,14 @@ public class StepsFragment extends Fragment {
             DetailsFragment detailsFragment = new DetailsFragment();
             Bundle bundle = new Bundle();
             bundle.putParcelable("step", mRecipe.getStep(selectedStep));
+            if (savedInstanceState != null) {
+                long currentPosition = savedInstanceState.getLong("currentPosition");
+                boolean playWhenReady = savedInstanceState.getBoolean("playWhenReady");
+                Bundle playerState = new Bundle();
+                playerState.putLong("currentPosition", currentPosition);
+                playerState.putBoolean("playWhenReady", playWhenReady);
+                bundle.putBundle("playerState", playerState);
+            }
             detailsFragment.setArguments(bundle);
             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -112,5 +124,13 @@ public class StepsFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("selectedStep", selectedStep);
+        PlayerView playerView = getActivity().findViewById(R.id.player);
+        if (playerView != null) {
+            Player player = playerView.getPlayer();
+            if (player != null) {
+                outState.putLong("currentPosition", player.getCurrentPosition());
+                outState.putBoolean("playWhenReady", player.getPlayWhenReady());
+            }
+        }
     }
 }

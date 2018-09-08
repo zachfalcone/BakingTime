@@ -49,12 +49,14 @@ public class DetailsFragment extends Fragment {
     private long mCurrentPosition;
     private boolean mPlayWhenReady;
     private Uri mVideoUri;
+    private Bundle mPlayerState;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mStep = getArguments().getParcelable("step");
+            mPlayerState = getArguments().getBundle("playerState");
         }
     }
 
@@ -95,6 +97,9 @@ public class DetailsFragment extends Fragment {
             if (savedInstanceState != null) {
                 mCurrentPosition = savedInstanceState.getLong("currentPosition");
                 mPlayWhenReady = savedInstanceState.getBoolean("playWhenReady");
+            } else if (mPlayerState != null) {
+                mCurrentPosition = mPlayerState.getLong("currentPosition");
+                mPlayWhenReady = mPlayerState.getBoolean("playWhenReady");
             } else {
                 mCurrentPosition = 0;
                 mPlayWhenReady = autoPlay;
