@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -45,6 +46,9 @@ public class DetailsFragment extends Fragment {
     private Step mStep;
     private ExoPlayer player;
     private boolean autoPlay;
+    private long mCurrentPosition;
+    private boolean mPlayWhenReady;
+    private Uri mVideoUri;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,43 +80,87 @@ public class DetailsFragment extends Fragment {
                 Picasso.with(getContext()).load(thumbnailURL).into(imageThumbnail);
             }
         } else {
-            // initialize player after layout inflated
             autoPlay = getActivity().findViewById(R.id.master_detail_flow) == null;
+
             view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                 @Override
                 public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
-                    initializePlayer();
-                    view.removeOnLayoutChangeListener(this);
+                    // video ratio: 1920:1080 = 16:9
+                    ViewGroup.LayoutParams layoutParams = playerView.getLayoutParams();
+                    layoutParams.height = (int) (playerView.getWidth() * (9f / 16f));
+                    playerView.setLayoutParams(layoutParams);
                 }
             });
+
+            if (savedInstanceState != null) {
+                mCurrentPosition = savedInstanceState.getLong("currentPosition");
+                mPlayWhenReady = savedInstanceState.getBoolean("playWhenReady");
+            } else {
+                mCurrentPosition = 0;
+                mPlayWhenReady = autoPlay;
+            }
+
+            mVideoUri = Uri.parse(mStep.getVideoURL());
         }
 
         return view;
     }
 
     private void initializePlayer() {
-        if (player == null) {
+        if (player == null && mVideoUri != null) {
             TrackSelector trackSelector = new DefaultTrackSelector();
             player = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector);
             playerView.setPlayer(player);
             String userAgent = Util.getUserAgent(getContext(), getString(R.string.app_name));
             MediaSource mediaSource = new ExtractorMediaSource.Factory(
                     new DefaultDataSourceFactory(getContext(), userAgent)
-            ).createMediaSource(Uri.parse(mStep.getVideoURL()));
+            ).createMediaSource(mVideoUri);
             player.prepare(mediaSource);
-            player.setPlayWhenReady(autoPlay);
-            playerView.hideController();
-
-            // video ratio: 1920:1080 = 16:9
-            ViewGroup.LayoutParams layoutParams = playerView.getLayoutParams();
-            layoutParams.height = (int) (playerView.getWidth() * (9f / 16f));
-            playerView.setLayoutParams(layoutParams);
+            player.seekTo(mCurrentPosition);
+            player.setPlayWhenReady(mPlayWhenReady);
+            if (mPlayWhenReady) {
+                playerView.hideController();
+            } else {
+                playerView.showController();
+            }
         }
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
+            initializePlayer();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initializePlayer();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (player != null) {
+            mCurrentPosition = player.getCurrentPosition();
+            mPlayWhenReady = player.getPlayWhenReady();
+        }
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
+    }
+
+    private void releasePlayer() {
         if (player != null) {
             player.stop();
             player.release();
@@ -121,10 +169,11 @@ public class DetailsFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
         if (player != null) {
-            player.setPlayWhenReady(false);
+            outState.putLong("currentPosition", mCurrentPosition);
+            outState.putBoolean("playWhenReady", mPlayWhenReady);
         }
     }
 
@@ -132,7 +181,7 @@ public class DetailsFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (player != null) {
-            player.setPlayWhenReady(isVisibleToUser);
+            player.setPlayWhenReady(isVisibleToUser && mPlayWhenReady);
             if (!isVisibleToUser) {
                 player.seekTo(0);
             } else {
