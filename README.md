@@ -5,7 +5,7 @@ Baking app project for [Udacity](https://www.udacity.com/)'s [Android Developer 
 
 - ExoPlayer
 - Fragments
- - Master Detail Flow
+  - Master Detail Flow
 - ViewPager
 - Widget
 
